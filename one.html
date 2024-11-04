@@ -1,0 +1,127 @@
+<?php
+require_once ('connexion.php');
+require_once ('Client/classe_client.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  // Admin login authentication
+  if (isset($_POST['admin_username']) && isset($_POST['admin_password'])) {
+    $admin_username = $_POST['admin_username'];
+    $admin_password = $_POST['admin_password'];
+
+    // Check admin credentials (replace with your admin credentials)
+    $admin_username_db = 'admin';
+    $admin_password_db = 'admin';
+
+    if ($admin_username === $admin_username_db && $admin_password === $admin_password_db) {
+      // Redirect to admin dashboard
+      header("Location: Admin/admin_dashboard.php");
+      exit();
+    } else {
+      echo "Invalid admin credentials.";
+    }
+  }
+
+  // Client login authentication
+  if (isset($_POST['username']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $client = new Client($connexion);
+    $clientData = $client->getClientByCIN($username); // Use CIN as username
+
+    if ($clientData && $clientData['CIN'] === $password) {
+      // Redirect to client dashboard with CIN as a parameter
+      header("Location: Client/client_dashboard.php?CIN=" . $clientData['CIN']);
+      exit();
+    } else {
+      echo "Invalid client credentials.";
+    }
+  }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .vl {
+      border-left: 2px solid #ddd;
+      height: 100%;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .vl-innertext {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media screen and (max-width: 768px) {
+      .vl {
+        display: none;
+      }
+
+      .vl-innertext {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Log In</h2>
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <form action="" method="post">
+          <div class="form-group">
+            <label for="username">Username (CIN)</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password (CIN)</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Log In</button>
+        </form>
+      </div>
+      <div class="col-md-1 d-flex align-items-center justify-content-center position-relative">
+        <div class="vl"></div>
+        <span class="vl-innertext">or</span>
+      </div>
+      <div class="col-md-5">
+        <form action="" method="post">
+          <div class="form-group">
+            <label for="admin_username">Admin Username</label>
+            <input type="text" class="form-control" id="admin_username" name="admin_username" placeholder="Enter Admin Username">
+          </div>
+          <div class="form-group">
+            <label for="admin_password">Admin Password</label>
+            <input type="password" class="form-control" id="admin_password" name="admin_password" placeholder="Enter Admin Password">
+          </div>
+          <button type="submit" class="btn btn-secondary btn-block">Log in as Admin</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap JS, Popper.js, and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
